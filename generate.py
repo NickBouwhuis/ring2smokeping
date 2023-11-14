@@ -44,17 +44,22 @@ title = {country_code}
             hostname = node['hostname'].split(".ring.nlnog.net")[0]
 
             # Add the node to the group and config file contents
-            country_contents += f"""
-+++ {hostname}
-menu = IPv4: {participant_name} (AS{node['asn']}) - {hostname}
-title = {participant_name} (AS{node['asn']}) - {hostname} - {node['ipv4']}
-host = {node['ipv4']}
-+++ {hostname}v6
-menu = IPv6: {participant_name} (AS{node['asn']}) - {hostname}
-probe = FPing6
-title = {participant_name} (AS{node['asn']}) - {hostname} - {node['ipv6']}
-host = {node['ipv6']}
-"""
+            if node['ipv4']:
+                country_contents += f"+++ {hostname}\n"
+                country_contents += f"menu = IPv4: {participant_name} (AS{node['asn']}) - {hostname}\n"
+                country_contents += f"title = {participant_name} (AS{node['asn']}) - {hostname} - {node['ipv4']}\n"
+                country_contents += f"host = {node['ipv4']}\n"
+
+            if node['ipv6']:
+                country_contents += f"+++ {hostname}v6\n"
+                country_contents += f"menu = IPv6: {participant_name} (AS{node['asn']}) - {hostname}\n"
+                country_contents += f"probe = FPing6\n"
+                country_contents += f"title = {participant_name} (AS{node['asn']}) - {hostname} - {node['ipv6']}\n"
+                country_contents += f"host = {node['ipv6']}\n"
+            
+            # Add newline at the end of each node config block
+            country_contents += "\n"
+
     # Write the group and config file contents to files
     with open(f'/tmp/smokeping/{country_code}.conf', 'w') as f:
         f.write(country_contents)
